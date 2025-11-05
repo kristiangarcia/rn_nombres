@@ -2,8 +2,17 @@ import axios from "axios"
 import { Probabilidad } from "../model/Tipos"
 
 async function consultarProbabilidades(nombre:string):Promise<Array<Probabilidad>>{
-    const endpoint = `https://api.nationalize.io/?name=${nombre}`
-    const respuestaServidor = await axios.get(endpoint)
+    const endpoint = `https://api.nationalize.io/`
+    const configuracion = {
+                            params : {
+                                name: nombre
+                            },
+                            headers: {
+                                "User-Agent": "Nombres/1.0 (correo@dominio.com)",
+                                "Accept": "application/json"
+                            }
+                        }
+    const respuestaServidor = await axios.get(endpoint,configuracion)
     const resultado = respuestaServidor.data.country
     for(let objeto of resultado){
         objeto.pais = await consultarNombrePais(objeto.country_id)
