@@ -1,24 +1,41 @@
 import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 import { consultarProbabilidades } from './helpers/ConsultasApi'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ItemPaisProbabilidad from './components/ItemPaisProbabilidad'
 import { Probabilidad } from './model/Tipos'
+import BienvenidaLayer from './components/layers/BienvenidaLayer'
+import CargaLayer from './components/layers/CargaLayer'
+import ResultadosLayer from './components/layers/ResultadosLayer'
 
 export default function App() {
   const [nombre, setNombre] = useState("")
   const [listaProbabilidades, setListaProbabilidades] = useState<Array<Probabilidad>>([])
+  const [capaActiva, setCapaActiva] = useState(1)
   function validarNombre():boolean{
     return nombre.trim() !== ""
   }
   function botonPulsado(){
     if(validarNombre()){
+      setCapaActiva(2)
       consultarProbabilidades(nombre)
-      .then( respuesta => setListaProbabilidades(respuesta))
-      .catch( error => Alert.alert("Error",error.toString()))
+        .then( respuesta => {
+          setListaProbabilidades(respuesta)
+          setCapaActiva(3)
+        })
+        .catch( error => {
+          Alert.alert("Error",error.toString())
+          setCapaActiva(1)
+        })
     }else{
       Alert.alert("Error","El nombre no puede dejarse vacío")
     }
+  }
+  function getCapaActiva():ReactNode{
+    return capaActiva === 1 ? <BienvenidaLayer/> :
+          capaActiva === 2 ? <CargaLayer/> :
+          capaActiva === 3 ? <ResultadosLayer listaProbabilidades={listaProbabilidades}/> :
+                            <View/>
   }
   return (
     <SafeAreaView style={styles.contenedorPrincipal}>
@@ -26,23 +43,22 @@ export default function App() {
         <TextInput
           value={nombre}
           onChangeText={setNombre}
+          editable={capaActiva!==2}
           placeholder={"Introduce tu nombre"}
           style={styles.cuadroTexto}
           placeholderTextColor={"#9CA3AF"} />
         <Pressable
           onPress={botonPulsado}
+          disabled={capaActiva===2}
           style={({ pressed }) => pressed ? styles.botonPresionado : styles.boton}>
           <Text style={styles.textoBoton}>Consultar</Text>
         </Pressable>
       </View>
-      <FlatList
-        data={listaProbabilidades}
-        renderItem={ItemPaisProbabilidad}
-        keyExtractor={item => item.country_id}
-        ListEmptyComponent={
-          () => <Text style={{margin:"auto"}}>No se han encontrado resultados</Text>
+      <View style={styles.contenedorCapas}>
+        {
+          getCapaActiva()
         }
-      />
+      </View>
     </SafeAreaView>
   )
 }
@@ -51,6 +67,9 @@ const styles = StyleSheet.create({
   contenedorPrincipal: {
     flex: 1,
     backgroundColor: "#f3f4f6"
+  },
+  contenedorCapas: {
+    flex: 1
   },
   fila: {
     flex: 1,
