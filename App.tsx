@@ -3,11 +3,12 @@ import React, { useState } from 'react'
 import { consultarProbabilidades } from './helpers/ConsultasApi'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ItemPaisProbabilidad from './components/ItemPaisProbabilidad'
+import { Probabilidad } from './model/Tipos'
 
 export default function App() {
   const [nombre, setNombre] = useState("")
-  const [listaProbabilidades, setListaProbabilidades] = useState([])
-  function validarNombre(){
+  const [listaProbabilidades, setListaProbabilidades] = useState<Array<Probabilidad>>([])
+  function validarNombre():boolean{
     return nombre.trim() !== ""
   }
   function botonPulsado(){

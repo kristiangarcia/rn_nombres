@@ -1,8 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Image } from 'expo-image'
+import { Probabilidad } from '../model/Tipos'
 
-export default function ItemPaisProbabilidad({ item }) {
+type ItemPaisProbabilidadProps = {
+    item: Probabilidad
+}
+export default function ItemPaisProbabilidad({ item }:ItemPaisProbabilidadProps) {
     console.log(item)
     return (
         <View style={styles.container}>
